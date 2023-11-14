@@ -1,7 +1,8 @@
 import express from "express";
 import configViewEngine from "./configs/viewEngine";
 import initProductRoute from "./route/product";
-import initCategoryRoute from "./route/category"
+import initCategoryRoute from "./route/category";
+import initOrderRoute from "./route/order";
 import cors from 'cors'
 
 require("dotenv").config();
@@ -22,6 +23,7 @@ configViewEngine(app);
 //init web route
 initProductRoute(app);
 initCategoryRoute(app);
+initOrderRoute(app);
 
 
 //Config local

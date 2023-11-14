@@ -1,96 +1,38 @@
 import pool from "../configs/connectDB";
-import multer from "multer";
 
-// let getHomePage = async (req, res) => {
-//   const [rows, fields] = await pool.execute("SELECT * FROM users");
-//   return res.render("index.ejs", { dataUser: rows });
-// };
+let name_file;
 
-// let getDetail = async (req, res) => {
-//   let idUser = req.params.id;
-//   console.log(idUser);
-//   const [user, fields] = await pool.execute(
-//     "SELECT * FROM users where id = ?",
-//     [idUser]
-//   );
-//   return res.send(JSON.stringify(user));
-// };
+let createProduct = async(req, res) => {
+  console.log('check boy: ', req.body.img);
+  let {img, id, iddm, CachDongGoi, TenSanPham, CongDung, DangBaoChe, HanDung, ThuongHieu, NhaSanXuat, NoiSanXuat, KeToa, ThanhPhanChinh} = req.body;
 
-// let getDetail_edit = async (req, res) => {
-//   let idUser = req.params.id;
-//   const [user] = await pool.execute("SELECT * FROM users where id = ?", [
-//     idUser,
-//   ]);
-//   return res.render("edit_user.ejs", { data: user[0] });
-// };
+  if (!img || !id || !iddm || !CachDongGoi || !TenSanPham || !CongDung || !DangBaoChe || !HanDung || !ThuongHieu || !NhaSanXuat || !NoiSanXuat || !KeToa || !ThanhPhanChinh) {
+    return res.status(404).json({
+      message: "failed",
+    });
+  }
+  else{
+    await pool.execute("INSERT INTO sanpham values (?, ?, ?, ?, ?, ?)", [
+      id,
+      name_User,
+      birth_datetime,
+      role_User,
+      sex,
+      name_file
+    ]);
+  }
+}
 
-// let updateUser = async (req, res) => {
-//   let idUser = req.body.idUser;
-//   let { id, name, birth, role, sex } = req.body;
-//   console.log(id, name, birth, role);
-//   const birth_datetime = new Date(birth);
-//   const [user] = await pool.execute(
-//     "UPDATE users SET id = ?, name_User = ?, birth = ?, role_User = ?, sex = ? where id = ?",
-//     [id, name, birth_datetime, role, sex, idUser]
-//   );
-
-//   return res.redirect("/");
-// };
-
-// let createUser = async (req, res) => {
-//   let { id, name, birth, role, sex } = req.body;
-//   await pool.execute("INSERT INTO users values (?, ?, ?, ?, ?)", [
-//     id,
-//     name,
-//     birth,
-//     role,
-//     sex,
-//   ]);
-//   console.log("check: ", req.body);
-//   return res.redirect("/");
-// };
-
-// let deleteUser = async (req, res) => {
-//   let idUser = req.body.userId;
-//   await pool.execute("DELETE FROM users WHERE id = ?", [idUser]);
-//   console.log("check: ", idUser);
-//   return res.redirect("/");
-// };
-
-// let uploadFile = async (req, res) => {
-//   return res.render("uploadFile.ejs");
-// };
-
-// let handleUploadFile = async (req, res) => {
-//   console.log(req.file);
-//   if (req.fileValidationError) {
-//     return res.send(req.fileValidationError);
-//   } else if (!req.file) {
-//     return res.send("Please select an image to upload");
-//   }
-
-//   // Display uploaded image for user validation
-//   // res.send(
-//   //   `You have uploaded this image: <hr/><img src="/image/${req.file.filename}" width="500"><hr /><a href="/system/user-manage/users">Upload another image</a>`
-//   // );
-//   // });
-// };
-
-// let handleUploadMultiple = async (req, res) => {
-//   if (req.fileValidationError) {
-//     return res.send(req.fileValidationError);
-//   } else if (!req.files) {
-//     return res.send("Please select an image to upload");
-//   }
-//   let result = "You have uploaded this image:";
-//   const lengthArray = req.files.length;
-//   for (let index = 0; index < lengthArray; index++) {
-//     result += `<hr/><img src="/image/${req.files[index].filename}" width="500"><hr />`;
-//   }
-
-//   result += `<a href="/upload">Upload another image</a>`;
-//   res.send(result);
-// };
+let handleUploadImage = async(req, res) => {
+  console.log('file up: ',req.file);
+  name_file = req.file.filename;
+  console.log('name_file: ',name_file);
+  if (req.fileValidationError) {
+    return res.send(req.fileValidationError);
+  } else if (!req.file) {
+    return res.send("Please select an image to upload");
+  }
+}
 
 let getProducts = async (req, res) => {
   const [rows, fields] = await pool.execute("SELECT * FROM sanpham");
@@ -114,6 +56,13 @@ let getProductByIDCategory = async (req, res, next) => {
   );
   return res.status(200).json({ data: rows });
 };
+
+let getProductBySearch = async (req, res, next) => {
+    let value = req.params.value;
+    console.log(value);
+    const [rows, fields] = await pool.execute("SELECT * FROM sanpham where TenSanPham LIKE ? ", [`%${value}%`]);
+    return res.status(200).json(rows);
+}
 
 let updateProductByID = async (req, res) => {
   try {
@@ -155,10 +104,23 @@ let updateProductByID = async (req, res) => {
         id,
       ]
     );
-    if(rows)
-    {
+    if (rows) {
       console.log(rows);
-      return res.status(200).json({message: 'Update product successful!'});
+      return res.status(200).json({ message: "Update product successful!" });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+let deleteProduct = async (req, res) => {
+  try {
+    let idProduct = req.body.id;
+    let result = await pool.execute("DELETE FROM sanpham WHERE id = ?", [idProduct]);
+    console.log("check: ", idProduct);
+    if(result)
+    {
+      return res.status(200).json({ message: "Product deleted successfully!" });
     }
   } catch (err) {
     console.log(err);
@@ -179,4 +141,8 @@ module.exports = {
   getProductById,
   getProductByIDCategory,
   updateProductByID,
+  deleteProduct,
+  createProduct,
+  handleUploadImage,
+  getProductBySearch
 };

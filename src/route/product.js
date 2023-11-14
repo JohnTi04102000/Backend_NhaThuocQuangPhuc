@@ -1,5 +1,5 @@
 import express from "express";
-import homeController from "../controller/productController";
+import productController from "../controller/productController";
 let router = express.Router();
 import multer from 'multer';
 import path from 'path';
@@ -29,23 +29,27 @@ let upload = multer({ storage: storage, fileFilter: imageFilter });
 
 
 const initProductRoute = (app) => {
-  // router.get("/", homeController.getHomePage);
-  router.get("/products", homeController.getProducts);
-  router.get("/product/:id", homeController.getProductById);
-  router.get("/category/:id", homeController.getProductByIDCategory);
-  router.patch("/update-product/:id", homeController.updateProductByID)
-  // router.get("/detail-user/:id", homeController.getDetail);
-  // router.get("/edit-user/:id", homeController.getDetail_edit);
-  // router.post("/update-user", homeController.updateUser); 
-  // router.post("/create-user", homeController.createUser);
-  // router.post("/delete-user", homeController.deleteUser);
+  // router.get("/", productController.getHomePage);
+  router.get("/products", productController.getProducts);
+  router.get("/product/:id", productController.getProductById);
+  router.get("/category/:id", productController.getProductByIDCategory);
+  router.get("/search-product/:value", productController.getProductBySearch);
+  router.post("/create-product", productController.createProduct);
+  router.post("/upload-image", upload.single('image-product'), productController.handleUploadImage);
+  router.patch("/update-product/:id", productController.updateProductByID)
+  router.delete("/delete-product", productController.deleteProduct);
+  // router.get("/detail-user/:id", productController.getDetail);
+  // router.get("/edit-user/:id", productController.getDetail_edit);
+  // router.post("/update-user", productController.updateUser); 
+  // router.post("/create-user", productController.createUser);
+  // router.post("/delete-user", productController.deleteUser);
 
 
-  // router.get("/upload", homeController.uploadFile);
+  // router.get("/upload", productController.uploadFile);
 
-  // router.post('/system/user-manage/users/upload-profile-pic', upload.single('profile_pic'), homeController.handleUploadFile);
+  // router.post('/system/user-manage/users/upload-profile-pic', upload.single('profile_pic'), productController.handleUploadFile);
 
-  // router.post('/upload-multiple-pic', upload.array('multiple_pic', 3), homeController.handleUploadMultiple);
+  // router.post('/upload-multiple-pic', upload.array('multiple_pic', 3), productController.handleUploadMultiple);
   // //Tiền tố phía trước router
   return app.use("/", router);
 };
