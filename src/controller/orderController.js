@@ -5,20 +5,73 @@ let getAllOrders = async (req, res) => {
   return res.status(200).json(rows);
 };
 
-let getAllOrderAccept = async (req, res) =>{
-  const [rows, fields] = await pool.execute("SELECT * FROM donhang where trangThai = 'Đã duyệt'" );
+let getAllOrderAccept = async (req, res) => {
+  const [rows, fields] = await pool.execute(
+    "SELECT * FROM donhang where trangThai = 'Đã duyệt'"
+  );
   return res.status(200).json(rows);
-}
+};
 
-let getAllOrderNotAccept = async (req, res) =>{
-  const [rows, fields] = await pool.execute("SELECT * FROM donhang where trangThai = 'Đang chờ duyệt'" );
+let getAllOrderNotAccept = async (req, res) => {
+  const [rows, fields] = await pool.execute(
+    "SELECT * FROM donhang where trangThai = 'Đang chờ duyệt'"
+  );
   return res.status(200).json(rows);
-}
+};
 
-let getAllOrderComplete = async (req, res) =>{
-  const [rows, fields] = await pool.execute("SELECT * FROM donhang where trangThai = 'Đã giao'" );
+let getAllOrderComplete = async (req, res) => {
+  const [rows, fields] = await pool.execute(
+    "SELECT * FROM donhang where trangThai = 'Đã giao'"
+  );
   return res.status(200).json(rows);
-}
+};
+
+let getUserById = async (req, res) => {
+  try {
+    let id_User = req.params.id;
+    if (id_User) {
+      const [rows, fields] = await pool.execute(
+        "SELECT * FROM khachhang where id = ?",
+        [id_User]
+      );
+      return res.status(200).json(rows);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+let updateOrderAccept = async (req, res) => {
+  try{
+    console.log(req.body);
+    let { id_User, id_Order } = req.body;
+    const [rows, fields] = await pool.execute(
+      "UPDATE donhang SET trangThai = 'Đã duyệt' where idKH = ? AND id = ?",
+      [id_User, id_Order]
+    );
+    return res.status(200).json({message: 'Update successful'});
+  }
+  catch(err) {
+    console.error(err);
+    return res.status(400).json({message: 'Update failed'});
+  }
+};
+
+let updateOrderComplete = async (req, res) => {
+  try{
+    console.log(req.body);
+    let { id_User, id_Order } = req.body;
+    const [rows, fields] = await pool.execute(
+      "UPDATE donhang SET trangThai = 'Đã giao' where idKH = ? AND id = ?",
+      [id_User, id_Order]
+    );
+    return res.status(200).json({message: 'Update successful'});
+  }
+  catch(err) {
+    console.error(err);
+    return res.status(400).json({message: 'Update failed'});
+  }
+};
 
 // let getCategoryById = async (req, res) => {
 //   let id_Category = req.params.id;
@@ -55,10 +108,13 @@ let getAllOrderComplete = async (req, res) =>{
 // };
 
 module.exports = {
-    getAllOrders,
-    getAllOrderAccept,
-    getAllOrderNotAccept,
-    getAllOrderComplete
-//   getCategoryById,
-//   updateCategoryById,
+  getAllOrders,
+  getAllOrderAccept,
+  getAllOrderNotAccept,
+  getAllOrderComplete,
+  getUserById,
+  updateOrderAccept,
+  updateOrderComplete
+  //   getCategoryById,
+  //   updateCategoryById,
 };

@@ -8,6 +8,9 @@ const initOrderRoute = (app) => {
   router.get("/order-accept", orderController.getAllOrderAccept);
   router.get("/order-notAccept", orderController.getAllOrderNotAccept);
   router.get("/order-complete", orderController.getAllOrderComplete);
+  router.get("/getUser/:id", orderController.getUserById);
+  router.patch("/order-accept", orderController.updateOrderAccept);
+  router.patch("/order-complete", orderController.updateOrderComplete);
 
 
   // //Tiền tố phía trước router
